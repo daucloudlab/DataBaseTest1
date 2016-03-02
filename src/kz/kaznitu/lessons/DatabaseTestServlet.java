@@ -1,5 +1,6 @@
 package kz.kaznitu.lessons;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -19,16 +20,21 @@ import java.sql.Statement;
 @WebServlet(urlPatterns = "/listUsers")
 public class DatabaseTestServlet extends HttpServlet{
 
+    @Resource(name = "jdbc/UsersDB")
+    private DataSource dataSource ;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter writer = resp.getWriter() ;
 
         try{
-            Context initContext = new InitialContext() ;
-            Context envContext = (Context)initContext.lookup("java:comp/env") ;
-            DataSource ds = (DataSource)envContext.lookup("jdbc/UsersDB") ;
-            Connection conn = ds.getConnection() ;
+//            Context initContext = new InitialContext() ;
+//            Context envContext = (Context)initContext.lookup("java:comp/env") ;
+//            DataSource ds = (DataSource)envContext.lookup("jdbc/UsersDB") ;
+//            Connection conn = ds.getConnection() ;
+
+            Connection conn = dataSource.getConnection() ;
 
             Statement statement = conn.createStatement();
             String sql = "select username, email from users";
@@ -40,8 +46,8 @@ public class DatabaseTestServlet extends HttpServlet{
                         rs.getString("username"), rs.getString("email")));
 
             }
-        }catch (NamingException ex){
-            System.err.println(ex);
+//        }catch (NamingException ex){
+//            System.err.println(ex);
         }catch (SQLException ex){
             System.err.println(ex) ;
         }
